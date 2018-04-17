@@ -7,14 +7,28 @@ def model(X):
         bias = tf.get_variable('bias' , shape=[10], initializer=tf.constant_initializer(0))
         
     z_1 = tf.matmul(X,weight) + bias
-    a_1 = tf.nn.sigmoid(z_1)
+    a_1 = tf.nn.tanh(z_1)
 
     with tf.variable_scope('weights_l2') as scope:
-        weight = tf.get_variable('weight' , shape=[10,1], initializer=tf.random_normal_initializer())
-        bias = tf.get_variable('bias',shape=[1] , initializer=tf.constant_initializer(0))
+        weight = tf.get_variable('weight', shape=[10,5],initializer=tf.random_normal_initializer())
+        bias = tf.get_variable('bias', shape=[5], initializer=tf.constant_initializer(0))
+
+    z_2 = tf.matmul(z_1,weight) + bias;
+    a_2 = tf.nn.tanh(z_2)
+
+    with tf.variable_scope('weights_l3') as scope:
+        weight = tf.get_variable('weight' , shape=[5,10], initializer=tf.random_normal_initializer())
+        bias = tf.get_variable('bias',shape=[10] , initializer=tf.constant_initializer(0))
     
-    z_2 = tf.matmul(a_1,weight) + bias
-    return z_2
+    z_3 = tf.matmul(a_2,weight) + bias
+    a_3 = tf.nn.tanh(z_3)
+
+    with tf.variable_scope('weights_l4') as scope:
+        weight = tf.get_variable('weight', shape=[10, 1], initializer=tf.random_normal_initializer())
+        bias = tf.get_variable('bias',shape=[1], initializer=tf.constant_initializer(0))
+
+    z_4 = tf.matmul(a_3,weight) + bias
+    return z_4
 
 def create_model(features_batch, labels_batch):
     with tf.variable_scope('nn') as scope:

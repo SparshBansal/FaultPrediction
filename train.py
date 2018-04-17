@@ -3,16 +3,16 @@ import input
 import linear
 import nn
 
-training_batch_size=150
+training_batch_size=659
 testing_batch_size=100
 
-learning_rate=0.1
+learning_rate=0.01
 batch_size = tf.placeholder(tf.int32,shape=[])
 
 def initialize_lookup_table():
     mapping_strings = tf.constant([
-        'N',
-        'Y'
+        'Y',
+        'N'
     ])
 
     table = tf.contrib.lookup.index_table_from_tensor(mapping=mapping_strings, default_value=-1)
@@ -51,7 +51,7 @@ with tf.Session() as sess:
     train_accuracy = compute_accuracy(train_prediction, labels_batch)
     test_accuracy = compute_accuracy(test_prediction , test_y)
 
-    optimizer = tf.train.AdamOptimizer()
+    optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
     train_step = optimizer.minimize(loss_a)
     
     sess.run(tf.global_variables_initializer())
@@ -59,10 +59,15 @@ with tf.Session() as sess:
     writer = tf.summary.FileWriter('./graph')
     writer.add_graph(sess.graph)
 
-    for _ in range(3000):
+    for _ in range(2000):
         _ , loss_val, acc_val = sess.run([train_step , loss_a , train_accuracy], feed_dict={batch_size : training_batch_size})
         print "Loss : {} / Accuracy {}".format(loss_val,acc_val)
 
     # lets test our accuracy 
-    acc_val = sess.run(test_accuracy, feed_dict={test_x : test_features, test_y : test_labels , batch_size : testing_batch_size})
+    acc_val , pred = sess.run([test_accuracy, test_prediction], feed_dict={test_x : test_features, test_y : test_labels , batch_size : testing_batch_size})
+
+    print "Prediction vector:-"
+    print pred
     print "Testing Accuracy : {}".format(acc_val)
+
+
